@@ -115,6 +115,98 @@ stock-management-app/
 - Add, Edit, Delete actions functional and connected to the Spring Boot API
 - App runs on `http://localhost:3000`
 
+### Sprint 2 Delivery - Entities and CRUD Interface
+
+**Objective:**
+Complete the stock model and deliver a functional CRUD application with Spring Boot + React, without authentication/security.
+
+**Backend completed:**
+- `Product`, `Category`, and `Supplier` JPA entities.
+- `Category` to `Product`: one-to-many / many-to-one relation.
+- `Product` to `Supplier`: many-to-many relation using join table `product_suppliers`.
+- CRUD repositories: `ProductRepository`, `CategoryRepository`, `SupplierRepository`.
+- CRUD services: `ProductService`, `CategoryService`, `SupplierService`.
+- REST controllers: `ProductController`, `CategoryController`, `SupplierController`.
+- Health endpoint: `GET /api/health`.
+
+**Backend endpoints:**
+
+```text
+GET    /api/products
+GET    /api/products/{id}
+POST   /api/products
+PUT    /api/products/{id}
+DELETE /api/products/{id}
+
+GET    /api/categories
+GET    /api/categories/{id}
+POST   /api/categories
+PUT    /api/categories/{id}
+DELETE /api/categories/{id}
+
+GET    /api/suppliers
+GET    /api/suppliers/{id}
+POST   /api/suppliers
+PUT    /api/suppliers/{id}
+DELETE /api/suppliers/{id}
+```
+
+**Product JSON example:**
+
+```json
+{
+  "name": "Laptop",
+  "description": "HP EliteBook",
+  "price": 8500,
+  "quantity": 10,
+  "categoryId": 1,
+  "supplierIds": [1, 2]
+}
+```
+
+**DTO architecture added:**
+- Controllers no longer expose JPA entities directly.
+- Request DTOs are used for incoming JSON:
+  - `ProductRequestDTO`
+  - `CategoryRequestDTO`
+  - `SupplierRequestDTO`
+- Response DTOs are used for API output:
+  - `ProductResponseDTO`
+  - `CategoryResponseDTO`
+  - `SupplierResponseDTO`
+- `StockMapper` converts between DTOs and JPA entities.
+- Product creation/update uses relation ids (`categoryId`, `supplierIds`) instead of nested JPA objects.
+
+**Frontend completed:**
+- React + Vite application.
+- React Router navigation: `/products`, `/products/:id`, `/categories`, `/suppliers`.
+- Axios API layer: `productApi.js`, `categoryApi.js`, `supplierApi.js`, `axiosConfig.js`.
+- Reusable components: `DataTable`, `FormModal`, `SearchBar`, `ConfirmDeleteModal`, `Navbar`.
+- CRUD pages: `ProductsPage`, `ProductDetailPage`, `CategoriesPage`, `SuppliersPage`.
+- Basic responsive CSS styling.
+
+**Sprint 2 verification:**
+
+```bash
+# Backend
+cd backend
+mvn test
+mvn spring-boot:run
+
+# Frontend
+cd frontend
+npm install
+npm run build
+npm run dev
+```
+
+**Expected result:**
+- Backend runs on `http://localhost:8080`.
+- Frontend runs on `http://localhost:5173`.
+- Products, categories, and suppliers can be listed, created, edited, deleted, and searched.
+- Product detail page shows category and suppliers.
+- No Spring Security or JWT is required for Sprint 2.
+
 ---
 
 ### Wijdane
