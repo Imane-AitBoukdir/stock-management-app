@@ -4,6 +4,9 @@ import com.example.backend.model.Product;
 import com.example.backend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +19,10 @@ public class ProductService {
 
     public List<Product> findAll() {
         return productRepository.findAll();
+    }
+
+    public Page<Product> findAll(Specification<Product> spec, Pageable pageable) {
+        return productRepository.findAll(spec, pageable);
     }
 
     public Optional<Product> findById(Long id) {
