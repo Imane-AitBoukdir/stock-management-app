@@ -1,6 +1,8 @@
 package com.example.backend.controller;
 
-import com.example.backend.model.Product;
+import com.example.backend.dto.ProductRequestDTO;
+import com.example.backend.dto.ProductResponseDTO;
+import com.example.backend.mapper.StockMapper;
 import com.example.backend.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,37 +17,37 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final StockMapper stockMapper;
 
-    // GET /api/products — list all
     @GetMapping
-    public ResponseEntity<List<Product>> getAll() {
-        return ResponseEntity.ok(productService.findAll());
+    public ResponseEntity<List<ProductResponseDTO>> getAll() {
+        return ResponseEntity.ok(productService.findAll().stream()
+                .map(stockMapper::toProductResponse)
+                .toList());
     }
 
-    // GET /api/products/{id} — get one
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponseDTO> getById(@PathVariable Long id) {
         return productService.findById(id)
+                .map(stockMapper::toProductResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /api/products — create
     @PostMapping
-    public ResponseEntity<Product> create(@RequestBody Product product) {
-        Product saved = productService.save(product);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    public ResponseEntity<ProductResponseDTO> create(@RequestBody ProductRequestDTO productRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(stockMapper.toProductResponse(productService.save(stockMapper.toProduct(productRequest))));
     }
 
-    // PUT /api/products/{id} — update
     @PutMapping("/{id}")
-    public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
-        return productService.update(id, product)
+    public ResponseEntity<ProductResponseDTO> update(@PathVariable Long id, @RequestBody ProductRequestDTO productRequest) {
+        return productService.update(id, stockMapper.toProduct(productRequest))
+                .map(stockMapper::toProductResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE /api/products/{id} — delete
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (productService.deleteById(id)) {

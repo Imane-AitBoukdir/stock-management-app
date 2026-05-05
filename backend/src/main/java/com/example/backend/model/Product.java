@@ -3,9 +3,13 @@ package com.example.backend.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -32,5 +36,17 @@ public class Product {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Category category;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "product_suppliers",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "supplier_id")
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Supplier> suppliers = new ArrayList<>();
 }
