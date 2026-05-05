@@ -6,6 +6,9 @@ import com.example.backend.repository.CategoryRepository;
 import com.example.backend.repository.ProductRepository;
 import com.example.backend.repository.SupplierRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,8 +23,14 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final SupplierRepository supplierRepository;
 
+    // Simple list — kept for internal/mapper use if needed
     public List<Product> findAll() {
         return productRepository.findAll();
+    }
+
+    // Paginated + filtered — for the controller's GET /api/products
+    public Page<Product> findAll(Specification<Product> spec, Pageable pageable) {
+        return productRepository.findAll(spec, pageable);
     }
 
     public Optional<Product> findById(Long id) {
@@ -54,6 +63,7 @@ public class ProductService {
         return true;
     }
 
+    // Resolves category and suppliers from DB to avoid detached entity issues
     private void attachRelations(Product product) {
         if (product.getCategory() != null && product.getCategory().getId() != null) {
             categoryRepository.findById(product.getCategory().getId())
