@@ -8,6 +8,8 @@
     radial-gradient(circle at 12% 0%, rgba(37, 99, 235, 0.12), transparent 34%),
     radial-gradient(circle at 90% 8%, rgba(20, 184, 166, 0.10), transparent 32%),
     #f5f7fb;
+}
+
 .sidebar {
   position: sticky;
   top: 0;
@@ -583,5 +585,214 @@ textarea:focus {
   .app-main {
     width: min(100% - 20px, 1180px);
     padding-top: 20px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SPRINT 3 — Auth & RBAC styles
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Auth pages ─────────────────────────────────────────────────────────────*/
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(246, 248, 252, 0.96)),
+    radial-gradient(circle at 12% 0%, rgba(37, 99, 235, 0.12), transparent 34%),
+    radial-gradient(circle at 90% 8%, rgba(20, 184, 166, 0.10), transparent 32%),
+    #f5f7fb;
+}
+
+.auth-container {
+  width: min(440px, 100%);
+  display: grid;
+  gap: 24px;
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.auth-logo-icon {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.auth-logo h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.auth-card {
+  padding: 28px 26px;
+  border: 1px solid rgba(203, 213, 225, 0.78);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 20px 56px rgba(15, 23, 42, 0.10);
+  display: grid;
+  gap: 18px;
+}
+
+.auth-card h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #111827;
+}
+
+.auth-subtitle {
+  margin: -10px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.auth-footer {
+  margin: 0;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.auth-footer a {
+  color: #2563eb;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.form-group {
+  display: grid;
+  gap: 7px;
+}
+
+.form-group label {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.input-error {
+  border-color: #dc2626 !important;
+}
+
+.error-msg {
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ── Spinner ─────────────────────────────────────────────────────────────────*/
+.spinner-sm {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Role badges inside sidebar ─────────────────────────────────────────────*/
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.role-badge.admin {
+  color: #7c3aed;
+  background: #ede9fe;
+}
+
+.role-badge.manager {
+  color: #0f766e;
+  background: #ccfbf1;
+}
+
+.role-badge.user {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+/* ── Logout button ───────────────────────────────────────────────────────────*/
+.logout-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #dc2626;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
+}
+
+.logout-btn:hover {
+  background: #fff5f5;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.12);
+}
+
+/* ── Unauthorized page ───────────────────────────────────────────────────────*/
+.unauthorized-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  place-content: center;
+  gap: 16px;
+  text-align: center;
+  padding: 40px;
+  color: #334155;
+}
+
+.unauthorized-icon {
+  color: #dc2626;
+  opacity: 0.7;
+}
+
+.unauthorized-page h2 {
+  margin: 0;
+  font-size: 28px;
+  color: #111827;
+}
+
+.unauthorized-page p {
+  margin: 0;
+  color: #64748b;
+}
+
+@media (max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr;
   }
 }
