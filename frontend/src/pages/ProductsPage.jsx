@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PackageSearch, Plus } from 'lucide-react'
 import DataTable from '../components/DataTable.jsx'
@@ -49,6 +49,14 @@ function ProductsPage() {
   const [categories, setCategories] = useState([])
   const [suppliers, setSuppliers] = useState([])
   const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
+  const [minPriceFilter, setMinPriceFilter] = useState('')
+  const [maxPriceFilter, setMaxPriceFilter] = useState('')
+  const [sort, setSort] = useState('name,asc')
+  const [page, setPage] = useState(0)
+  const [size, setSize] = useState(10)
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalElements, setTotalElements] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [modalMode, setModalMode] = useState(null)
@@ -56,16 +64,30 @@ function ProductsPage() {
   const [form, setForm] = useState(emptyProduct)
   const [deleteTarget, setDeleteTarget] = useState(null)
 
-  const loadData = async () => {
+  const loadData = async (pageIndex = page, pageSize = size) => {
     setLoading(true)
     setError('')
     try {
       const [productsResponse, categoriesResponse, suppliersResponse] = await Promise.all([
-        getProducts(),
+        getProducts({
+          page: pageIndex,
+          size: pageSize,
+          sort,
+          name: search || undefined,
+          category: categoryFilter || undefined,
+          minPrice: minPriceFilter || undefined,
+          maxPrice: maxPriceFilter || undefined,
+        }),
         getCategories(),
         getSuppliers(),
       ])
-      setProducts(productsResponse.data.content ?? productsResponse.data)
+
+      const pageData = productsResponse.data
+      setProducts(pageData.content ?? [])
+      setPage(pageData.number)
+      setSize(pageData.size)
+      setTotalPages(pageData.totalPages)
+      setTotalElements(pageData.totalElements)
       setCategories(categoriesResponse.data)
       setSuppliers(suppliersResponse.data)
     } catch {
@@ -78,37 +100,14 @@ function ProductsPage() {
   useEffect(() => {
     let active = true
 
-    Promise.all([getProducts(), getCategories(), getSuppliers()])
-      .then(([productsResponse, categoriesResponse, suppliersResponse]) => {
-        if (!active) return
-        setProducts(productsResponse.data.content ?? productsResponse.data)
-        setCategories(categoriesResponse.data)
-        setSuppliers(suppliersResponse.data)
-      })
-      .catch(() => {
-        if (active) {
-          setError('Unable to load stock data. Check that the Spring Boot backend is running.')
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false)
-        }
-      })
+    loadData(0)
 
     return () => {
       active = false
     }
   }, [])
 
-  const filteredProducts = useMemo(() => {
-    const term = search.toLowerCase()
-    return products.filter((product) =>
-      [product.name, product.description, product.category?.name]
-        .filter(Boolean)
-        .some((value) => value.toLowerCase().includes(term)),
-    )
-  }, [products, search])
+  const filteredProducts = products
 
   const openCreate = () => {
     setForm(emptyProduct)
@@ -215,20 +214,121 @@ function ProductsPage() {
 
       <div className="toolbar">
         <SearchBar value={search} onChange={setSearch} placeholder="Search products..." />
+        <label className="search-bar">
+          <span>Category</span>
+          <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+            <option value="">All categories</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="search-bar">
+          <span>Min price</span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={minPriceFilter}
+            onChange={(event) => setMinPriceFilter(event.target.value)}
+            placeholder="0.00"
+          />
+        </label>
+        <label className="search-bar">
+          <span>Max price</span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={maxPriceFilter}
+            onChange={(event) => setMaxPriceFilter(event.target.value)}
+            placeholder="0.00"
+          />
+        </label>
+        <label className="search-bar">
+          <span>Sort</span>
+          <select value={sort} onChange={(event) => setSort(event.target.value)}>
+            <option value="name,asc">Name ▲</option>
+            <option value="name,desc">Name ▼</option>
+            <option value="price,asc">Price ▲</option>
+            <option value="price,desc">Price ▼</option>
+            <option value="quantity,asc">Quantity ▲</option>
+            <option value="quantity,desc">Quantity ▼</option>
+          </select>
+        </label>
+        <button type="button" className="btn secondary" onClick={() => loadData(0)}>
+          Apply
+        </button>
+        <button
+          type="button"
+          className="btn subtle"
+          onClick={() => {
+            setSearch('')
+            setCategoryFilter('')
+            setMinPriceFilter('')
+            setMaxPriceFilter('')
+            setSort('name,asc')
+            loadData(0)
+          }}
+        >
+          Reset
+        </button>
       </div>
 
       {error && <p className="alert error">{error}</p>}
       {loading ? (
         <p className="status-text">Loading products...</p>
       ) : (
-        <DataTable
-          columns={columns}
-          data={filteredProducts}
-          emptyMessage="No products found."
-          onView={(product) => navigate(`/products/${product.id}`)}
-          onEdit={canManageProducts ? openEdit : undefined}
-          onDelete={canManageProducts ? setDeleteTarget : undefined}
-        />
+        <>
+          <DataTable
+            columns={columns}
+            data={filteredProducts}
+            emptyMessage="No products found."
+            onView={(product) => navigate(`/products/${product.id}`)}
+            onEdit={canManageProducts ? openEdit : undefined}
+            onDelete={canManageProducts ? setDeleteTarget : undefined}
+          />
+          <div className="pagination-controls">
+            <button
+              type="button"
+              className="btn subtle"
+              disabled={page <= 0}
+              onClick={() => loadData(page - 1)}
+            >
+              Previous
+            </button>
+            <span>
+              Page {totalPages ? page + 1 : 0} of {totalPages} · {totalElements} items
+            </span>
+            <button
+              type="button"
+              className="btn subtle"
+              disabled={page + 1 >= totalPages}
+              onClick={() => loadData(page + 1)}
+            >
+              Next
+            </button>
+            <label className="search-bar">
+              <span>Items</span>
+              <select
+              value={size}
+              onChange={(event) => {
+                const newSize = Number(event.target.value)
+                setSize(newSize)
+                loadData(0, newSize)
+              }}
+            >
+              {[5, 10, 20, 50].map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            </label>
+          </div>
+        </>
       )}
 
       {modalMode && (
