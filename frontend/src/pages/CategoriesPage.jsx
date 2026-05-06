@@ -5,8 +5,11 @@ import SearchBar from '../components/SearchBar.jsx'
 import FormModal from '../components/FormModal.jsx'
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal.jsx'
 import { createCategory, deleteCategory, getCategories, updateCategory } from '../api/categoryApi.js'
+import { useAuth } from '../context/Authcontext.jsx'
 
 function CategoriesPage() {
+  const { hasAnyRole } = useAuth()
+  const canManageCategories = hasAnyRole(['ROLE_ADMIN', 'ROLE_MANAGER'])
   const [categories, setCategories] = useState([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
@@ -115,10 +118,12 @@ function CategoriesPage() {
             Product groups
           </h2>
         </div>
-        <button type="button" className="btn primary" onClick={openCreate}>
-          <Plus size={17} />
-          Add Category
-        </button>
+        {canManageCategories && (
+          <button type="button" className="btn primary" onClick={openCreate}>
+            <Plus size={17} />
+            Add Category
+          </button>
+        )}
       </div>
 
       <div className="toolbar">
@@ -133,8 +138,8 @@ function CategoriesPage() {
           columns={[{ key: 'name', label: 'Name' }]}
           data={filteredCategories}
           emptyMessage="No categories found."
-          onEdit={openEdit}
-          onDelete={setDeleteTarget}
+          onEdit={canManageCategories ? openEdit : undefined}
+          onDelete={canManageCategories ? setDeleteTarget : undefined}
         />
       )}
 

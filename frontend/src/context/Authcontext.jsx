@@ -10,7 +10,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = useCallback(async (credentials) => {
     const data = await authService.login(credentials);
-    setUser(data.user);
+    setUser({
+      username: data.username,
+      email: data.email,
+      roles: data.roles,
+    });
     setIsAuthenticated(true);
     return data;
   }, []);

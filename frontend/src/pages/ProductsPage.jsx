@@ -8,6 +8,7 @@ import ConfirmDeleteModal from '../components/ConfirmDeleteModal.jsx'
 import { createProduct, deleteProduct, getProducts, updateProduct } from '../api/productApi.js'
 import { getCategories } from '../api/categoryApi.js'
 import { getSuppliers } from '../api/supplierApi.js'
+import { useAuth } from '../context/Authcontext.jsx'
 
 const emptyProduct = {
   name: '',
@@ -42,6 +43,8 @@ function toPayload(form) {
 
 function ProductsPage() {
   const navigate = useNavigate()
+  const { hasAnyRole } = useAuth()
+  const canManageProducts = hasAnyRole(['ROLE_ADMIN', 'ROLE_MANAGER'])
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [suppliers, setSuppliers] = useState([])
@@ -62,7 +65,7 @@ function ProductsPage() {
         getCategories(),
         getSuppliers(),
       ])
-      setProducts(productsResponse.data)
+      setProducts(productsResponse.data.content ?? productsResponse.data)
       setCategories(categoriesResponse.data)
       setSuppliers(suppliersResponse.data)
     } catch {
@@ -78,7 +81,7 @@ function ProductsPage() {
     Promise.all([getProducts(), getCategories(), getSuppliers()])
       .then(([productsResponse, categoriesResponse, suppliersResponse]) => {
         if (!active) return
-        setProducts(productsResponse.data)
+        setProducts(productsResponse.data.content ?? productsResponse.data)
         setCategories(categoriesResponse.data)
         setSuppliers(suppliersResponse.data)
       })
@@ -202,10 +205,12 @@ function ProductsPage() {
             Stock items
           </h2>
         </div>
-        <button type="button" className="btn primary" onClick={openCreate}>
-          <Plus size={17} />
-          Add Product
-        </button>
+        {canManageProducts && (
+          <button type="button" className="btn primary" onClick={openCreate}>
+            <Plus size={17} />
+            Add Product
+          </button>
+        )}
       </div>
 
       <div className="toolbar">
@@ -221,8 +226,8 @@ function ProductsPage() {
           data={filteredProducts}
           emptyMessage="No products found."
           onView={(product) => navigate(`/products/${product.id}`)}
-          onEdit={openEdit}
-          onDelete={setDeleteTarget}
+          onEdit={canManageProducts ? openEdit : undefined}
+          onDelete={canManageProducts ? setDeleteTarget : undefined}
         />
       )}
 

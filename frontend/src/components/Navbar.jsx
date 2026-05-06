@@ -1,7 +1,7 @@
 // src/components/Navbar.jsx  — Sprint 3: shows logged-in user + logout
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Boxes, Package, Tags, Truck, LogOut, UserCircle, ShieldCheck } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/Authcontext';
 
 function Navbar() {
   const { user, logout, hasRole } = useAuth();
@@ -48,6 +48,12 @@ function Navbar() {
           <Truck size={18} />
           <span>Suppliers</span>
         </NavLink>
+        {hasRole('ROLE_ADMIN') && (
+          <NavLink to="/admin">
+            <ShieldCheck size={18} />
+            <span>Admin</span>
+          </NavLink>
+        )}
       </nav>
 
       {/* ── Logged-in user panel ─────────────────────────────── */}
