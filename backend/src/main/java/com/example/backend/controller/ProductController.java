@@ -99,7 +99,7 @@ public class ProductController {
 
     // DELETE /api/products/{id} — delete
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (productService.deleteById(id)) {
             return ResponseEntity.noContent().build();

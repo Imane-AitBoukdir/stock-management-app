@@ -5,6 +5,7 @@ import SearchBar from '../components/SearchBar.jsx'
 import FormModal from '../components/FormModal.jsx'
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal.jsx'
 import { createSupplier, deleteSupplier, getSuppliers, updateSupplier } from '../api/supplierApi.js'
+import { useAuth } from '../context/Authcontext.jsx'
 
 const emptySupplier = {
   name: '',
@@ -13,6 +14,8 @@ const emptySupplier = {
 }
 
 function SuppliersPage() {
+  const { hasAnyRole } = useAuth()
+  const canManageSuppliers = hasAnyRole(['ROLE_ADMIN', 'ROLE_MANAGER'])
   const [suppliers, setSuppliers] = useState([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
@@ -145,10 +148,12 @@ function SuppliersPage() {
             Supplier directory
           </h2>
         </div>
-        <button type="button" className="btn primary" onClick={openCreate}>
-          <Plus size={17} />
-          Add Supplier
-        </button>
+        {canManageSuppliers && (
+          <button type="button" className="btn primary" onClick={openCreate}>
+            <Plus size={17} />
+            Add Supplier
+          </button>
+        )}
       </div>
 
       <div className="toolbar">
@@ -163,8 +168,8 @@ function SuppliersPage() {
           columns={columns}
           data={filteredSuppliers}
           emptyMessage="No suppliers found."
-          onEdit={openEdit}
-          onDelete={setDeleteTarget}
+          onEdit={canManageSuppliers ? openEdit : undefined}
+          onDelete={canManageSuppliers ? setDeleteTarget : undefined}
         />
       )}
 
