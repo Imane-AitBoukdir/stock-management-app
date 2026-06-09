@@ -253,39 +253,134 @@ main ─────────────────────────
 
 ---
 
-## Setup Instructions
+## How to Run the Project
 
-### Backend
+### Prerequisites
+
+| Tool      | Version  | Purpose                      |
+|-----------|----------|------------------------------|
+| Java      | 17+      | Spring Boot backend runtime  |
+| Maven     | 3.8+     | Backend dependency management|
+| MySQL     | 8+       | Application database         |
+| Node.js   | 18+      | React frontend runtime       |
+| npm       | 9+       | Frontend dependency management|
+
+### Step 1 — Create the MySQL database
+
+```bash
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS stockdb;"
+```
+
+### Step 2 — Configure the backend environment
+
+Copy the example environment file and edit it with your credentials:
 
 ```bash
 cd backend
-
-# Requirements: Java 17+, Maven, MySQL 8 running locally
-
-# 1. Create the database
-mysql -u root -p -e "CREATE DATABASE stockdb;"
-
-# 2. Update src/main/resources/application.properties:
-#    spring.datasource.url=jdbc:mysql://localhost:3306/stockdb
-#    spring.datasource.username=root
-#    spring.datasource.password=yourpassword
-
-# 3. Run the application
-mvn spring-boot:run
-# API available at http://localhost:8080
-# Swagger UI at  http://localhost:8080/swagger-ui.html
+cp .env.example .env
 ```
 
-### Frontend
+Edit `.env` with your values:
+
+```properties
+DB_URL=jdbc:mysql://localhost:3306/stockdb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+DB_USERNAME=root
+DB_PASSWORD=your_mysql_password
+APP_CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+APP_JWT_SECRET=replace-with-a-base64-encoded-secret-at-least-32-bytes-long
+APP_JWT_EXPIRATION_MS=86400000
+```
+
+> **Note:** If you prefer not to use a `.env` file, `application.properties` already contains safe defaults for local development. You only need to ensure your MySQL password matches (`mysql` by default).
+
+### Step 3 — Start the backend
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+The backend starts on **http://localhost:8080**. You can verify it is running:
+
+| URL                                    | Description            |
+|----------------------------------------|------------------------|
+| `http://localhost:8080/api/health`      | Health check endpoint  |
+| `http://localhost:8080/swagger-ui.html` | Swagger API docs       |
+
+### Step 4 — Configure the frontend environment (optional)
 
 ```bash
 cd frontend
+cp .env.example .env
+```
 
-# Requirements: Node.js 18+
+The `.env` file contains:
 
+```properties
+VITE_API_BASE_URL=http://localhost:8080/api
+```
+
+> This is only needed if your backend runs on a different host or port. The default value is already set in `axiosConfig.js`.
+
+### Step 5 — Start the frontend
+
+```bash
+cd frontend
 npm install
-npm run dev    # or: npm start (if using CRA)
-# App available at http://localhost:3000 (or :5173 for Vite)
+npm run dev
+```
+
+The frontend starts on **http://localhost:5173**.
+
+### Step 6 — Use the application
+
+1. Open **http://localhost:5173** in your browser.
+2. You will be redirected to the **login page**.
+3. Click **Register** to create your first user account (username + password).
+4. After registration, you are automatically logged in and redirected to the **Products** dashboard.
+5. From the sidebar, navigate between **Products**, **Categories**, and **Suppliers** to manage your stock.
+
+### Quick start (all commands)
+
+```bash
+# Terminal 1 — Backend
+cd backend
+mvn spring-boot:run
+
+# Terminal 2 — Frontend
+cd frontend
+npm install
+npm run dev
+```
+
+### One-click backend startup (Windows)
+
+A convenience script is provided to check prerequisites, create the database, and start the backend in one command:
+
+```bash
+# From the project root
+start-backend.bat
+```
+
+The script will:
+- Verify that Java, Maven, and MySQL are installed
+- Load credentials from `backend/.env` if it exists
+- Create the `stockdb` database if it does not exist
+- Start the Spring Boot server
+
+### Running tests
+
+```bash
+cd backend
+mvn test
+```
+
+### Building the frontend for production
+
+```bash
+cd frontend
+npm run build    # Output in frontend/dist/
+npm run preview  # Preview the production build locally
 ```
 
 ---

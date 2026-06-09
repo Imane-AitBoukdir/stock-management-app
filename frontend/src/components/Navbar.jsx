@@ -1,7 +1,10 @@
 import { NavLink } from 'react-router-dom'
-import { Boxes, LayoutDashboard, Package, Tags, Truck } from 'lucide-react'
+import { Boxes, LayoutDashboard, LogOut, Package, ShieldCheck, Tags, Truck } from 'lucide-react'
+import { useAuth } from '../context/AuthContext.jsx'
 
 function Navbar() {
+  const { logout, user } = useAuth()
+
   return (
     <aside className="sidebar">
       <div className="brand-block">
@@ -28,16 +31,22 @@ function Navbar() {
       </nav>
 
       <div className="sidebar-panel">
-        <LayoutDashboard size={18} />
+        <ShieldCheck size={18} />
         <div>
-          <strong></strong>
-          <span></span>
+          <strong>{user?.username || 'Authenticated user'}</strong>
+          <span>{user?.role === 'ROLE_USER' ? 'JWT session active' : user?.role || 'Protected access'}</span>
         </div>
       </div>
 
       <div className="sidebar-footer">
-        <Boxes size={18} />
-        <span>No security mode</span>
+        <div className="sidebar-footer-copy">
+          <Boxes size={18} />
+          <span>Protected inventory routes</span>
+        </div>
+        <button type="button" className="btn subtle sidebar-logout" onClick={logout}>
+          <LogOut size={16} />
+          Logout
+        </button>
       </div>
     </aside>
   )
