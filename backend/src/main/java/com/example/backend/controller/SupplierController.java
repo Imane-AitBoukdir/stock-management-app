@@ -4,6 +4,7 @@ import com.example.backend.dto.SupplierRequestDTO;
 import com.example.backend.dto.SupplierResponseDTO;
 import com.example.backend.mapper.StockMapper;
 import com.example.backend.service.SupplierService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +36,13 @@ public class SupplierController {
     }
 
     @PostMapping
-    public ResponseEntity<SupplierResponseDTO> create(@RequestBody SupplierRequestDTO supplierRequest) {
+    public ResponseEntity<SupplierResponseDTO> create(@Valid @RequestBody SupplierRequestDTO supplierRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(stockMapper.toSupplierResponse(supplierService.save(stockMapper.toSupplier(supplierRequest))));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SupplierResponseDTO> update(@PathVariable Long id, @RequestBody SupplierRequestDTO supplierRequest) {
+    public ResponseEntity<SupplierResponseDTO> update(@PathVariable Long id, @Valid @RequestBody SupplierRequestDTO supplierRequest) {
         return supplierService.update(id, stockMapper.toSupplier(supplierRequest))
                 .map(stockMapper::toSupplierResponse)
                 .map(ResponseEntity::ok)

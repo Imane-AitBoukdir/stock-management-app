@@ -4,6 +4,7 @@ import com.example.backend.dto.ProductRequestDTO;
 import com.example.backend.dto.ProductResponseDTO;
 import com.example.backend.mapper.StockMapper;
 import com.example.backend.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +36,13 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponseDTO> create(@RequestBody ProductRequestDTO productRequest) {
+    public ResponseEntity<ProductResponseDTO> create(@Valid @RequestBody ProductRequestDTO productRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(stockMapper.toProductResponse(productService.save(stockMapper.toProduct(productRequest))));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> update(@PathVariable Long id, @RequestBody ProductRequestDTO productRequest) {
+    public ResponseEntity<ProductResponseDTO> update(@PathVariable Long id, @Valid @RequestBody ProductRequestDTO productRequest) {
         return productService.update(id, stockMapper.toProduct(productRequest))
                 .map(stockMapper::toProductResponse)
                 .map(ResponseEntity::ok)

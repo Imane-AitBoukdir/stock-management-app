@@ -4,6 +4,7 @@ import com.example.backend.dto.CategoryRequestDTO;
 import com.example.backend.dto.CategoryResponseDTO;
 import com.example.backend.mapper.StockMapper;
 import com.example.backend.service.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +36,13 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryResponseDTO> create(@RequestBody CategoryRequestDTO categoryRequest) {
+    public ResponseEntity<CategoryResponseDTO> create(@Valid @RequestBody CategoryRequestDTO categoryRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(stockMapper.toCategoryResponse(categoryService.save(stockMapper.toCategory(categoryRequest))));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> update(@PathVariable Long id, @RequestBody CategoryRequestDTO categoryRequest) {
+    public ResponseEntity<CategoryResponseDTO> update(@PathVariable Long id, @Valid @RequestBody CategoryRequestDTO categoryRequest) {
         return categoryService.update(id, stockMapper.toCategory(categoryRequest))
                 .map(stockMapper::toCategoryResponse)
                 .map(ResponseEntity::ok)

@@ -16,6 +16,10 @@ function Navbar() {
       </div>
 
       <nav className="nav-tabs" aria-label="Main navigation">
+        <NavLink to="/dashboard">
+          <LayoutDashboard size={18} />
+          <span>Dashboard</span>
+        </NavLink>
         <NavLink to="/products">
           <Package size={18} />
           <span>Products</span>
